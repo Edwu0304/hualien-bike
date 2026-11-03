@@ -60,6 +60,14 @@
     .search-wrap svg { position: absolute; top: 50%; left: 15px; width: 18px; height: 18px; color: var(--muted); transform: translateY(-50%); pointer-events: none; }
     .search { width: 100%; min-height: 48px; padding: 0 16px 0 44px; border: 1px solid var(--line); border-radius: 5px; background: white; color: var(--ink); }
     .result-count { margin: 0 0 10px; color: var(--muted); font-size: 13px; }
+    .day-alert { display: grid; gap: 10px; margin: 0 0 16px; }
+    .day-alert-card { padding: 16px 18px; border: 2px solid #c94324; border-left: 8px solid #c94324; border-radius: 6px; background: #fff2ec; box-shadow: 0 8px 20px rgb(67 35 22 / 9%); }
+    .day-alert-heading { display: flex; align-items: flex-start; gap: 9px; margin: 0 0 7px; color: #8d2c16; font-size: clamp(18px, 2.7vw, 21px); font-weight: 900; line-height: 1.35; }
+    .day-alert-mark { flex: 0 0 auto; padding: 2px 7px; border-radius: 3px; background: #c94324; color: #fff; font-size: 12px; font-weight: 900; letter-spacing: .08em; line-height: 1.5; }
+    .day-alert-body { margin: 0; color: #55271b; font-size: 15px; font-weight: 700; line-height: 1.7; }
+    .day-alert-links { display: flex; flex-wrap: wrap; gap: 8px 16px; margin: 10px 0 0; padding: 0; list-style: none; }
+    .day-alert-links a { color: #8d2c16; font-size: 14px; font-weight: 800; text-underline-offset: 3px; }
+    .day-alert-meta { display: block; margin-top: 7px; color: #8b5a4a; font-size: 12px; font-weight: 650; }
     .entries { display: grid; gap: 10px; }
     .entry { display: grid; grid-template-columns: minmax(110px, .34fr) minmax(0, 1fr) auto; align-items: start; gap: 18px; padding: 18px 20px; border: 1px solid var(--line); border-left: 4px solid var(--leaf); border-radius: 5px; background: var(--white); animation: arrive .28s ease both; }
     .entry-heading { min-width: 0; }
@@ -125,6 +133,7 @@
       </div>
       <p class="file-status" id="file-status">花東縱谷單車行程 · 3 天騎乘</p>
       <div class="sheet-tabs" id="day-tabs" role="tablist" aria-label="行程日期" hidden></div>
+      <div class="day-alert" id="day-alert" role="alert" hidden></div>
       <label class="search-wrap" id="search-wrap">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 4.5 4.5"/></svg>
         <input class="search" id="search" type="search" placeholder="搜尋地點、時間或備註" autocomplete="off">
@@ -149,6 +158,7 @@
     const searchWrap = document.querySelector("#search-wrap");
     const search = document.querySelector("#search");
     const resultCount = document.querySelector("#result-count");
+    const dayAlert = document.querySelector("#day-alert");
     let activeDay = "1";
 
     const itinerary = [
@@ -203,6 +213,94 @@
       "3": ["關山環鎮自行車道", "武陵綠色隧道", "武陵綠色隧道", "鹿野龍田自行車道", "鹿野龍田自行車道", "龍田－台東市"]
     };
 
+    const dayAlerts = {
+      "1": [
+        {
+          title: "台9線馬太鞍溪鋼便橋：施工通行，請減速",
+          text: "馬太鞍溪橋復建中，鋼便橋目前可通行（限速 40）。行經 246K+574–247K+750 請減速，遇豪雨或工程管制可能封閉；出發前請查公路局即時路況。",
+          links: [
+            { label: "新聞：馬太鞍溪鋼便橋通車", url: "https://www.sjtv.com.tw/articles/101619?lang=en" },
+            { label: "公路局即時路況", url: "https://168.thb.gov.tw" }
+          ],
+          meta: "資料查證：2026-11-03 · 目前非封閉"
+        }
+      ],
+      "2": [
+        {
+          title: "玉富自行車道封閉（3K+100 至 9K+100）",
+          text: "2026/6/8–12/31 封閉。只能騎玉里火車站↔3K+100，之後必須原路折返玉里，再改走台9線到富里；東里鐵馬驛站不能經車道貫通。",
+          links: [
+            { label: "官方封閉公告", url: "https://www.erv-nsa.gov.tw/zh-tw/event/news/6078" }
+          ],
+          meta: "花東縱谷國家風景區管理處 · 2026-09-30 更新"
+        }
+      ],
+      "3": [
+        {
+          title: "197縣道災後復建（30K+800、35K+800）",
+          text: "樺加沙颱風災損路段復建工程仍在招標，龍田→台東市可能遇施工或管制。目前查無近期全段封閉新聞，但出發前務必查即時路況；如遇管制請改走台9線。",
+          links: [
+            { label: "復建工程招標資料", url: "https://twbuying.org/region/%E8%87%BA%E6%9D%B1%E7%B8%A3" },
+            { label: "公路局即時路況", url: "https://168.thb.gov.tw" }
+          ],
+          meta: "政府採購資料 2026-09-22 · 尚無明確封閉公告"
+        }
+      ]
+    };
+
+    function renderDayAlert() {
+      const alerts = dayAlerts[activeDay] || [];
+      dayAlert.replaceChildren();
+      if (!alerts.length) {
+        dayAlert.hidden = true;
+        return;
+      }
+
+      alerts.forEach(alert => {
+        const card = document.createElement("section");
+        card.className = "day-alert-card";
+        const heading = document.createElement("h3");
+        heading.className = "day-alert-heading";
+        const mark = document.createElement("span");
+        mark.className = "day-alert-mark";
+        mark.textContent = "注意";
+        const title = document.createElement("span");
+        title.textContent = alert.title;
+        heading.append(mark, title);
+
+        const body = document.createElement("p");
+        body.className = "day-alert-body";
+        body.textContent = alert.text;
+        card.append(heading, body);
+
+        if (alert.links?.length) {
+          const list = document.createElement("ul");
+          list.className = "day-alert-links";
+          alert.links.forEach(linkItem => {
+            const item = document.createElement("li");
+            const link = document.createElement("a");
+            link.href = linkItem.url;
+            link.target = "_blank";
+            link.rel = "noopener noreferrer";
+            link.textContent = linkItem.label;
+            item.append(link);
+            list.append(item);
+          });
+          card.append(list);
+        }
+
+        if (alert.meta) {
+          const meta = document.createElement("span");
+          meta.className = "day-alert-meta";
+          meta.textContent = alert.meta;
+          card.append(meta);
+        }
+
+        dayAlert.append(card);
+      });
+      dayAlert.hidden = false;
+    }
+
     function renderDayTabs() {
       dayTabs.replaceChildren();
       const options = [
@@ -221,6 +319,7 @@
         button.addEventListener("click", () => {
           activeDay = value;
           renderDayTabs();
+          renderDayAlert();
           renderEntries();
         });
         dayTabs.append(button);
@@ -337,6 +436,7 @@
     }
 
     renderDayTabs();
+    renderDayAlert();
     renderEntries();
     search.addEventListener("input", renderEntries);
   </script>
