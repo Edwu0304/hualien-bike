@@ -1,0 +1,8 @@
+# Excel 暫存/鎖定檔
+~$*.xlsx
+*.xlsx
+
+# 系統檔
+.DS_Store
+Thumbs.db
+desktop.ini

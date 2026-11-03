@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#174c3e">
+  <title>花東縱谷單車行程</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --forest: #174c3e;
+      --leaf: #d6ef73;
+      --coral: #e76d4b;
+      --ink: #1c2924;
+      --muted: #62706a;
+      --paper: #f5f7f1;
+      --line: #dce3da;
+      --white: #fff;
+      font-family: "Noto Sans TC", "Microsoft JhengHei", "PingFang TC", sans-serif;
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+    }
+
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--paper); color: var(--ink); }
+    button, input { font: inherit; }
+    button, a, input { -webkit-tap-highlight-color: transparent; }
+    button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid var(--coral); outline-offset: 3px; }
+
+    .hero {
+      min-height: 330px;
+      display: flex;
+      align-items: end;
+      color: var(--white);
+      background: linear-gradient(90deg, rgb(15 49 39 / 80%), rgb(15 49 39 / 8%)),
+        linear-gradient(0deg, rgb(15 49 39 / 50%), transparent 62%),
+        url("https://images.pexels.com/photos/417074/pexels-photo-417074.jpeg?auto=compress&cs=tinysrgb&w=1800") center 48% / cover;
+    }
+
+    .hero-inner, main { width: min(100% - 40px, 920px); margin-inline: auto; }
+    .hero-inner { padding: 46px 0 34px; }
+    .eyebrow { margin: 0 0 12px; color: var(--leaf); font-size: 13px; font-weight: 800; letter-spacing: .12em; }
+    h1 { max-width: 700px; margin: 0; font-family: "Noto Serif TC", "PMingLiU", "Songti TC", serif; font-size: clamp(36px, 9vw, 66px); font-weight: 700; line-height: 1.18; }
+    .hero-note { margin: 14px 0 0; color: rgb(255 255 255 / 84%); font-size: 15px; }
+
+    main { padding: 28px 0 64px; }
+    .toolbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
+    .section-title { margin: 0; font-size: 22px; font-weight: 800; }
+    .import-label { min-height: 46px; display: inline-flex; align-items: center; justify-content: center; gap: 9px; padding: 0 17px; border-radius: 6px; background: var(--forest); color: var(--white); font-size: 14px; font-weight: 750; cursor: pointer; transition: background .18s ease, transform .18s ease; }
+    .import-label:hover { background: #22624f; transform: translateY(-1px); }
+    .import-label svg { width: 18px; height: 18px; }
+    #workbook-input { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
+
+    .file-status { min-height: 22px; margin: -8px 0 18px; color: var(--muted); font-size: 13px; }
+    .sheet-tabs { display: flex; gap: 8px; overflow-x: auto; padding: 2px 2px 12px; scrollbar-width: thin; }
+    .sheet-tab { flex: 0 0 auto; min-height: 40px; padding: 0 15px; border: 1px solid var(--line); border-radius: 4px; background: transparent; color: var(--muted); font-weight: 700; cursor: pointer; }
+    .sheet-tab[aria-selected="true"] { border-color: var(--forest); background: var(--forest); color: white; }
+
+    .search-wrap { position: relative; margin: 8px 0 18px; }
+    .search-wrap svg { position: absolute; top: 50%; left: 15px; width: 18px; height: 18px; color: var(--muted); transform: translateY(-50%); pointer-events: none; }
+    .search { width: 100%; min-height: 48px; padding: 0 16px 0 44px; border: 1px solid var(--line); border-radius: 5px; background: white; color: var(--ink); }
+    .result-count { margin: 0 0 10px; color: var(--muted); font-size: 13px; }
+    .entries { display: grid; gap: 10px; }
+    .entry { display: grid; grid-template-columns: minmax(110px, .34fr) minmax(0, 1fr) auto; align-items: start; gap: 18px; padding: 18px 20px; border: 1px solid var(--line); border-left: 4px solid var(--leaf); border-radius: 5px; background: var(--white); animation: arrive .28s ease both; }
+    .entry-heading { min-width: 0; }
+    .entry-title { margin: 0; font-size: 17px; font-weight: 800; line-height: 1.45; overflow-wrap: anywhere; }
+    .entry-index { display: block; margin-bottom: 5px; color: var(--coral); font-size: 11px; font-weight: 800; letter-spacing: .08em; }
+    .entry-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px 18px; }
+    .field { min-width: 0; }
+    .field-label { display: block; margin-bottom: 4px; color: var(--muted); font-size: 11px; font-weight: 700; }
+    .field-value { display: block; font-size: 14px; line-height: 1.55; overflow-wrap: anywhere; white-space: pre-wrap; }
+    .map-link { align-self: center; display: inline-flex; align-items: center; gap: 6px; padding: 9px 10px; border-radius: 4px; background: #edf4e9; color: var(--forest); font-size: 12px; font-weight: 800; text-decoration: none; white-space: nowrap; }
+    .map-link svg { width: 16px; height: 16px; }
+    .map-options { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding-top: 12px; border-top: 1px solid var(--line); }
+    .map-options-label { flex: 0 0 100%; color: var(--muted); font-size: 11px; font-weight: 800; }
+    .route-note { flex: 1 1 100%; margin: 0; color: var(--muted); font-size: 12px; line-height: 1.55; }
+    .map-link { min-height: 38px; white-space: normal; }
+    .map-link svg { flex: 0 0 auto; }
+
+    .empty { padding: 36px 20px; border: 1px dashed #b6c4b8; border-radius: 5px; text-align: center; }
+    .empty-mark { width: 48px; height: 48px; display: grid; place-items: center; margin: 0 auto 14px; border-radius: 50%; background: var(--leaf); color: var(--forest); }
+    .empty-mark svg { width: 23px; height: 23px; }
+    .empty h3 { margin: 0 0 8px; font-size: 18px; }
+    .empty p { max-width: 420px; margin: 0 auto; color: var(--muted); font-size: 14px; line-height: 1.7; }
+    .privacy { margin: 18px 0 0; color: var(--muted); font-size: 12px; text-align: center; }
+    .error { color: #a83e2b !important; }
+    [hidden] { display: none !important; }
+
+    @keyframes arrive { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    @media (max-width: 620px) {
+      .hero { min-height: 290px; background-position: 58% center; }
+      .hero-inner, main { width: min(100% - 28px, 920px); }
+      .hero-inner { padding-bottom: 26px; }
+      main { padding-top: 22px; }
+      .toolbar { align-items: flex-start; }
+      .section-title { padding-top: 8px; font-size: 19px; }
+      .import-label { min-height: 42px; padding-inline: 12px; font-size: 13px; }
+      .entry { grid-template-columns: minmax(0, 1fr) auto; gap: 12px; padding: 15px; }
+      .entry-heading { grid-column: 1 / -1; }
+      .entry-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+      .map-link { grid-column: 1 / -1; justify-self: start; }
+    }
+    @media (max-width: 370px) {
+      .entry-fields { grid-template-columns: 1fr; }
+      .hero-inner, main { width: min(100% - 24px, 920px); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-inner">
+      <p class="eyebrow">TAITUNG · HUALIEN · BY BIKE</p>
+      <h1>沿著縱谷，<br>慢慢騎。</h1>
+      <p class="hero-note">花東縱谷單車行程</p>
+    </div>
+  </header>
+
+  <main>
+    <section aria-labelledby="itinerary-heading">
+      <div class="toolbar">
+        <h2 class="section-title" id="itinerary-heading">旅程安排</h2>
+      </div>
+      <p class="file-status" id="file-status">花東縱谷單車行程 · 3 天騎乘</p>
+      <div class="sheet-tabs" id="day-tabs" role="tablist" aria-label="行程日期" hidden></div>
+      <label class="search-wrap" id="search-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 4.5 4.5"/></svg>
+        <input class="search" id="search" type="search" placeholder="搜尋地點、時間或備註" autocomplete="off">
+      </label>
+      <p class="result-count" id="result-count"></p>
+      <div class="entries" id="entries" aria-live="polite"></div>
+      <div class="empty" id="empty-state" hidden>
+        <div class="empty-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19 9 5l4 14 3-9 4 9"/><path d="M3 19h18"/></svg></div>
+        <h3 id="empty-title">把行程帶上路</h3>
+        <p id="empty-copy">換個關鍵字搜尋，或切換日期查看其他安排。</p>
+      </div>
+      <p class="privacy">行程已內建於此頁面。地圖導航與參考連結需要網路。</p>
+    </section>
+  </main>
+
+  <script>
+    const dayTabs = document.querySelector("#day-tabs");
+    const entries = document.querySelector("#entries");
+    const emptyState = document.querySelector("#empty-state");
+    const emptyTitle = document.querySelector("#empty-title");
+    const emptyCopy = document.querySelector("#empty-copy");
+    const searchWrap = document.querySelector("#search-wrap");
+    const search = document.querySelector("#search");
+    const resultCount = document.querySelector("#result-count");
+    let activeDay = "1";
+
+    const itinerary = [
+      { day: "1", title: "汐止 → 花蓮：自強 272", fields: [{ label: "出發時間", value: "7:43" }, { label: "抵達時間", value: "11:00" }, { label: "車程資訊", value: "07:43 - 10:40 · $541" }, { label: "備註", value: "阿勝租車，捷安特 27 速變速車，隔天下班前 400 元" }], mapOptions: [{ label: "阿勝租車（花蓮）", query: "阿勝租車 花蓮" }] },
+      { day: "1", title: "新聞：193縣道月眉段封閉至2028年2月", url: "https://www.ksnews.com.tw/e/92644" },
+      { day: "1", title: "花蓮－瑞穗", fields: [{ label: "出發時間", value: "11:30" }, { label: "抵達時間", value: "17:30（需按改道重估）" }, { label: "路線", value: "193 縣道沿線為主；壽豐月眉段封閉，必須改道" }, { label: "縣市", value: "花蓮" }, { label: "里程", value: "原估約 70 公里，未含封路改道" }, { label: "騎乘時間", value: "原估約 4.5 小時，未含封路改道" }, { label: "沿途與住宿", value: "交通部「臺灣騎跡」193道路縱騎路線列出米棧古道、太巴塱部落、山興／光復、鶴岡等節點；本行程由花蓮出發，沿線順序大致相符。\n重要路況：壽豐鄉月眉段縣道193線24K+000至30K+150，公告自2026/4/20至2028/2/28全天封閉。此段不可通行，請依現場管制改道；Google 地圖可能未即時反映封路，出發前重新確認路況、總里程與抵達時間。\nPDF 景點另列可選順遊；富興社區鳳梨公園位於瑞穗鄉，其他景點不代表都在193主線上。耕香園 x SERA 咖啡（玉里鎮松浦里松浦40-1號）目前 Google 地圖標示暫時歇業，已自本行程移除，重新確認營業後再考慮加入。\n住宿：瑞穗山下的厝溫泉民宿，瑞穗鄉溫泉路三段 137 號" }], mapOptions: [{ label: "富興社區鳳梨公園（瑞穗；193沿線）", query: "富興社區鳳梨公園 花蓮縣瑞穗鄉" }, { label: "大農大富平地森林園區（光復順遊）", query: "大農大富平地森林園區 花蓮縣光復鄉" }, { label: "吉蒸牧場（瑞穗順遊）", query: "吉蒸牧場 花蓮縣瑞穗鄉" }, { label: "春日綠色隧道（193沿線）", query: "春日綠色隧道 花蓮縣瑞穗鄉" }, { label: "部落皇后藝術咖啡（瑞穗）", query: "Tribal Queen Art Cafe 部落皇后藝術咖啡 瑞穗" }, { label: "米棧古道（193旁步行支線）", query: "米棧古道 花蓮縣壽豐鄉" }, { label: "山下的厝溫泉民宿", query: "山下的厝溫泉民宿 瑞穗鄉溫泉路三段137號" }] },
+      { day: "2", title: "瑞穗－玉里", place: "瑞穗-玉里", fields: [{ label: "出發時間", value: "8:00" }, { label: "抵達時間", value: "11:00" }, { label: "路線", value: "193 縣道" }, { label: "縣市", value: "花蓮" }, { label: "里程", value: "25 公里" }, { label: "騎乘時間", value: "2 小時" }, { label: "沿途美食", value: "玉里：玉里麵、橋頭臭豆腐" }], mapOptions: [{ label: "傳統美食玉里麵（中山路二段 94 號）", query: "傳統美食玉里麵 花蓮縣玉里鎮中山路二段94號" }, { label: "玉里橋頭臭豆腐（民權街 15 號）", query: "玉里橋頭臭豆腐 花蓮縣玉里鎮民權街15號" }] },
+      { day: "2", title: "玉里－富里", place: "玉里-富里", fields: [{ label: "出發時間", value: "11:00" }, { label: "抵達時間", value: "12:30" }, { label: "路線", value: "玉富自行車道（封閉段折返）＋台 9 線替代" }, { label: "縣市", value: "花蓮" }, { label: "里程", value: "依折返與改道調整" }, { label: "騎乘時間", value: "依折返與改道調整" }, { label: "沿途與美食", value: "官方公告：玉富自行車道 3K+100 至 9K+100 封閉至 2026/12/31；目前騎至 3K+100 後須折返玉里，再改走台 9 線前往富里。\n富里：富麗米便當" }], mapOptions: [{ label: "玉富自行車道板塊交界地標", query: "玉富自行車道 歐亞板塊 菲律賓海板塊交界地標" }, { label: "東里車站與東里鐵馬驛站（附近順遊）", query: "東里車站 東里鐵馬驛站" }, { label: "富麗禾風餐廳（富麗便當）", query: "富麗禾風餐廳 富麗便當 花蓮縣富里鄉羅山村東湖6號" }] },
+      { day: "2", title: "富里－池上", place: "富里-池上", fields: [{ label: "出發時間", value: "13:00" }, { label: "抵達時間", value: "16:30" }, { label: "路線", value: "花 75 卓富稻香線" }, { label: "縣市", value: "花蓮" }, { label: "里程", value: "30 公里" }, { label: "騎乘時間", value: "2 小時" }, { label: "沿途與美食", value: "花 75 卓富公路沿線田園與布農族聚落，造訪社區請遵守部落訪客規定。\n路線核對：交通部「臺灣騎跡」的卓富稻香線為玉里至池上約 43.8 公里，花 75 主段由玉里長良至富里學田；與原表「富里－池上 30 公里」分段不完全一致，建議出發前核對路線及接線。\n池上：池上便當、池上豆皮" }], mapOptions: [{ label: "花 75 卓富公路與卓富大橋", query: "卓富大橋 花75 卓富公路" }, { label: "卓樂、南安、崙天布農族聚落（沿線）", query: "花75 卓富公路 卓樂 南安 崙天" }, { label: "池上便當全美行（中正路 1 號）", query: "池上便當全美行 台東縣池上鄉中正路1號" }, { label: "大池豆皮店（大埔路 39 之 2 號）", query: "大池豆皮店 台東縣池上鄉大埔路39之2號" }] },
+      { day: "2", title: "池上－關山", place: "池上-關山", fields: [{ label: "出發時間", value: "16:30" }, { label: "抵達時間", value: "19:00" }, { label: "路線", value: "池上－關山轉場（官方參考約 38 公里）" }, { label: "縣市", value: "台東" }, { label: "里程", value: "約 38 公里；池上環鄉 29.8 公里另計" }, { label: "騎乘時間", value: "依實際路線與停留調整" }, { label: "沿途與住宿", value: "池上環鄉自行車道 29.8 公里為池上環線，不是池上－關山轉場。\n關山：關山便當、關山豬腳\n住宿：觀山閣民宿，關山鎮中華北路 38 號" }], mapOptions: [{ label: "大坡池風景區（池上）", query: "大坡池風景區 台東縣池上鄉" }, { label: "伯朗大道（池上）", query: "伯朗大道 台東縣池上鄉" }, { label: "關山便當（和平路 83 號）", query: "關山便當 台東縣關山鎮和平路83號" }, { label: "關山豬腳（搜尋附近店家）", query: "豬腳 台東縣關山鎮" }, { label: "觀山閣（電梯）民宿", query: "觀山閣電梯民宿 956台東縣關山鎮豐泉里中華北路38號" }] },
+      { day: "3", title: "關山環鎮自行車道", place: "關山環鎮自行車道 台東縣關山鎮", fields: [{ label: "出發時間", value: "9:00" }, { label: "抵達時間", value: "10:30" }, { label: "縣市", value: "台東" }, { label: "里程", value: "12 公里" }, { label: "騎乘時間", value: "1.5 小時" }, { label: "備註", value: "關山－台東約 45 公里" }], mapOptions: [{ label: "關山親水公園（車道起點）", query: "關山親水公園 台東縣關山鎮" }, { label: "縱關日月亭（親山段）", query: "縱關日月亭 關山" }, { label: "關山到台東（約 45 公里）單車路線", origin: "台東縣關山鎮", destination: "台東市", travelmode: "bicycling" }] },
+      { day: "3", title: "武陵綠色隧道", place: "武陵綠色隧道 鹿野", fields: [{ label: "縣市", value: "台東" }, { label: "里程", value: "4.7 公里" }, { label: "騎乘時間", value: "0.5 小時" }, { label: "備註", value: "位於舊台 9 線永嶺路。每月雙週星期六 14:00 至 18:00，有臺東 2626 農村市集。" }], mapOptions: [{ label: "二層坪水橋（附近順遊）", query: "二層坪水橋 台東縣鹿野鄉" }, { label: "臺東 2626 農村市集（鹿野）", query: "臺東2626農村市集 鹿野" }] },
+      { day: "3", title: "鹿野龍田自行車道", place: "鹿野-龍田", fields: [{ label: "縣市", value: "台東" }, { label: "里程", value: "7.2 公里" }, { label: "騎乘時間", value: "1 小時" }], mapOptions: [{ label: "鹿野神社（龍田村內）", query: "鹿野神社 台東縣鹿野鄉" }, { label: "龍田桐花大道（自行車道周邊）", query: "龍田桐花大道 台東縣鹿野鄉" }] },
+      { day: "3", title: "龍田－台東市", place: "龍田-台東市", fields: [{ label: "抵達時間", value: "16:00" }, { label: "路線", value: "197 縣道" }, { label: "縣市", value: "台東" }, { label: "騎乘時間", value: "2 小時" }, { label: "備註", value: "阿勝還車。尚未核實 197 縣道本段可順停景點，請以原定道路騎乘並出發前確認路況。" }], mapOptions: [{ label: "阿勝租車（台東還車）", query: "阿勝租車 台東市" }] },
+      { day: "other", title: "台東 → 花蓮", fields: [{ label: "日期", value: "10/25（日）" }, { label: "車次選項", value: "16:25－18:22\n16:55－19:03\n17:54－20:07\n18:04－23:50（到汐止）\n18:35－20:33" }, { label: "花蓮 → 汐止", value: "10/25（日）\n18:32－20:58\n19:24－22:32\n21:20－23:50" }] },
+      { day: "other", title: "參考路線：花東縱谷", url: "https://ctyeh.com/articles/798" },
+      { day: "other", title: "參考路線：自行車路線", url: "https://ctyeh.com/articles/2000" },
+      { day: "other", title: "參考路線：台灣自行車旅遊", url: "https://taiwanbike.tw/bikeRoute/tour/A29/" },
+      { day: "other", title: "參考路線：鹿野自行車路線", url: "https://theme.erv-nsa.gov.tw/bike/zh-tw/themes/luye" }
+    ];
+
+    const dailyRoutes = {
+      "1": [
+        { label: "方案A：193縣道", displayLabel: "方案A：193縣道", origin: "阿勝租車 花蓮", waypoints: ["月眉國小 花蓮縣壽豐鄉", "米棧古道 花蓮縣壽豐鄉", "山興 花蓮縣鳳林鎮", "太巴塱部落 花蓮縣光復鄉", "大農大富平地森林園區 花蓮縣光復鄉", "富興社區 花蓮縣瑞穗鄉", "鶴岡遊客中心 花蓮縣瑞穗鄉"], destination: "山下的厝溫泉民宿 瑞穗鄉溫泉路三段137號", travelmode: "driving", stops: "阿勝單車出租 → 月眉國小 → 米棧古道 → 山興 → 太巴塱 → 大農大富 → 富興 → 鶴岡 → 瑞穗住宿", note: "主線以 193 縣道為主：花蓮市走台11丙經月眉大橋接回 193，避開 24K+000–30K+150 封閉段（至 2028/2/28），再經米棧、山興、太巴塱、大農大富、富興、鶴岡進瑞穗市區，末段轉花62 到民宿。Google 開車模式約 80 公里；單車模式會自動繞離 193，故本連結以開車模式固定路線，實際騎乘里程與時間請另估。" },
+        { label: "方案B：台9線", displayLabel: "方案B：台9線", url: "https://www.google.com/maps/place/%E9%B3%B3%E6%9E%97%E5%81%9C%E8%BB%8A%E5%A0%B4%E8%87%AD%E8%B1%86%E8%85%90/@23.7008093,121.1795083,10.71z/data=!4m58!1m51!4m50!1m6!1m2!1s0x34689fb9e46e008d:0x4a309032c1882f29!2z6Zi_5Yud5Zau6LuK5Ye656efIDk3MOiKseiTrue4o-iKseiTruW4guWci-iBr-mHjOWci-iBr-S4gOi3rzE1MuiZnw!2m2!1d121.6023367!2d23.9912019!1m6!1m2!1s0x3468a441cff0db95:0xa944dec558b64a45!2z5aO96LGQ5bCP5ZCD772c6ZqG5rGf6LGs6IWzIDk3NOiKseiTrue4o-WjveixkOmEieWjveixkOadkeWjveixkOi3r-S4gOautTExNuiZnw!2m2!1d121.5106682!2d23.8698414!1m6!1m2!1s0x3468ae02d87fd42b:0x387dd06330824c5b!2z6bOz5p6X5YGc6LuK5aC06Iet6LGG6IWQIDk3NeiKseiTrue4o-mzs-ael-mOrumzs-aZuumHjOS4reato-i3r-S6jOautTYx6Jmf!2m2!1d121.4485202!2d23.7454883!1m6!1m2!1s0x3468b2caef8bc4a5:0xba144f44d3f995a4!2z6Iqx6JOu6KeA5YWJ57OW5bugIDk3NjQy6Iqx6JOu57ij5YWJ5b6p6YSJ5aSn6YCy5p2R57OW5bug6KGXMTnomZ8!2m2!1d121.4206067!2d23.6586905!1m6!1m2!1s0x346f4d01befebff9:0xa52a6b968d1aa9f2!2z5aSn6L6y5aSn5a-M5bmz5Zyw5qOu5p6X5ZyS5Y2AIDk3NuiKseiTrue4o-WFieW-qemEieWkp-WFqOadkei-suWgtOi3rzMy6Jmf!2m2!1d121.4159184!2d23.6145565!1m6!1m2!1s0x346f4509b52f28c7:0xb76359f7529b8092!2z5pil5pel57ag6Imy6Zqn6YGTIDk4MeiKseiTrue4o-eOiemHjOmOruaoguW-t-WFrOi3rw!2m2!1d121.4013136!2d23.4629142!1m6!1m2!1s0x346f46044f1d4827:0x56b4840d6f6b5929!2z5bGx5LiL55qE5Y6d5rqr5rOJ5rCR5a6_IDk3OOiKseiTrue4o-eRnuepl-mEieeRnuelpeadkea6q-aziei3r-S4ieautTEzN-iZnw!2m2!1d121.3499127!2d23.4945219!3e1!3m5!1s0x3468ae02d87fd42b:0x387dd06330824c5b!8m2!3d23.7454883!4d121.4485202!16s%2Fg%2F11cnzgx6p5?entry=ttu&g_ep=EgoyMDI2MTAyOC4wIKXMDSoASAFQAw%3D%3D", stops: "阿勝單車出租 → 壽豐小吃｜隆江豬腳 → 鳳林停車場臭豆腐 → 花蓮觀光糖廠 → 大農大富平地森林園區 → 春日綠色隧道 → 瑞穗住宿", note: "方案B（台9線）使用固定導航連結，停靠點為阿勝單車出租、壽豐小吃（隆江豬腳）、鳳林停車場臭豆腐、花蓮觀光糖廠、大農大富平地森林園區、春日綠色隧道、山下的厝溫泉民宿；路線以台9線為主，可能偏離193縣道。耕香園 x SERA 咖啡位於玉里鎮松浦里松浦40-1號，Google 地圖標示暫時歇業，已移除並非本日停靠點。月眉段縣道193線24K+000至30K+150封閉至2028/2/28，Google 地圖可能未即時反映封路，此路線不代表封閉路段已有合法改道；出發前請核對現場改道與總里程，原定17:30抵達時間不適用。" }
+      ],
+      "2": [
+        { label: "瑞穗 → 玉里（193 縣道）", origin: "山下的厝溫泉民宿 瑞穗鄉溫泉路三段137號", waypoints: ["193縣道 瑞穗大橋", "193縣道 玉里樂合"], destination: "傳統美食玉里麵 花蓮縣玉里鎮中山路二段94號", stops: "193 縣道瑞穗大橋至玉里樂合段 · 傳統美食玉里麵", note: "玉里餐飲位於市區，導航會帶您離開 193 縣道進市區。" },
+        { label: "玉里火車站 → 玉富自行車道入口（開放段折返）", origin: "玉里火車站 花蓮縣玉里鎮", waypoints: [], destination: "玉富自行車道 花蓮縣玉里鎮", stops: "玉里火車站 → 玉富自行車道入口；接續車道至 3K+100 後原路折返", note: "Google 無法精確定位 3K+100 里程樁，因此此連結只導航至車道入口。管理處公告 3K+100 至 9K+100 封閉至 2026/12/31；入口後請依現場指標騎至開放終點折返，不要進入封閉路段。" },
+        { label: "玉里 → 富里餐廳（台 9 線替代）", origin: "玉里橋頭臭豆腐 花蓮縣玉里鎮民權街15號", waypoints: ["富里火車站 花蓮縣富里鄉"], destination: "富麗禾風餐廳 花蓮縣富里鄉羅山村東湖6號", stops: "玉里市區 → 台 9 線富里路段 → 富麗禾風餐廳", note: "玉富自行車道 3K+100 至 9K+100 封閉期間，改走台 9 線；Google 地圖若提供其他路線，請確認未導入封閉路段。" },
+        { label: "富里 → 池上（卓富稻香線／花 75）", origin: "富麗禾風餐廳 花蓮縣富里鄉羅山村東湖6號", waypoints: ["富里鄉學田村 花蓮縣富里鄉", "卓富大橋 花75鄉道", "布農族部落 卓樂", "池上車站 台東縣池上鄉"], destination: "池上大坡池豐澤橋 台東縣池上鄉", stops: "富里餐廳 → 學田端 → 花 75 卓富公路／卓富大橋 → 卓樂部落 → 池上", note: "用學田、卓富大橋與卓樂作為道路定位點；Google 仍可能改走其他路段，開啟後請檢查路線是否沿花 75。" },
+        { label: "池上環鄉自行車道（29.8 公里環線與補給點）", origin: "大坡池豐澤橋 台東縣池上鄉", waypoints: ["大觀樓 池上", "伯朗大道 台東縣池上鄉", "萬安社區公園 池上", "池上便當全美行 台東縣池上鄉中正路1號", "大池豆皮店 台東縣池上鄉大埔路39之2號"], destination: "大坡池豐澤橋 台東縣池上鄉", stops: "豐澤橋 → 大觀樓 → 伯朗大道／萬安 → 池上補給 → 豐澤橋", note: "這是池上鄉內環線，官方長度 29.8 公里；實際依車道指標騎乘，勿將此里程計入池上－關山轉場。" },
+        { label: "池上 → 關山（官方轉場參考路線）", origin: "大坡池豐澤橋 台東縣池上鄉", waypoints: ["池上車站 台東縣池上鄉", "初來橋 台東縣海端鄉", "樟香綠廊 台東縣海端鄉", "關山親水公園 台東縣關山鎮", "關山便當 台東縣關山鎮和平路83號"], destination: "觀山閣電梯民宿 台東縣關山鎮豐泉里中華北路38號", stops: "池上 → 初來橋 → 樟香綠廊 → 關山親水公園 → 關山便當 → 住宿", note: "依花東縱谷管理處池上－關山單車遊程的道路節點設途經點，官方參考全程約 38 公里；Google 試算後請核對是否經 197 縣道、台 20 線／20 甲線及池上關山連絡道路。" }
+      ],
+      "3": [
+        { label: "觀山閣 → 關山環鎮自行車道（12 公里環線）", origin: "觀山閣電梯民宿 956台東縣關山鎮豐泉里中華北路38號", waypoints: ["關山親水公園", "縱關日月亭 關山"], destination: "關山親水公園 台東縣關山鎮", stops: "關山親水公園 · 縱關日月亭 · 返回親水公園", note: "以親水公園作為環線起訖點；實際車道請依現場指標行駛。" },
+        { label: "關山 → 武陵（台 9 線轉場）", origin: "關山親水公園 台東縣關山鎮", waypoints: ["鹿野車站 台東縣鹿野鄉"], destination: "武陵綠色隧道 永嶺路 鹿野", stops: "關山 → 鹿野車站／台 9 線鹿野段 → 武陵綠色隧道", note: "這段是關山至武陵的轉場；武陵綠色隧道自行車道 4.7 公里另為該車道本身長度。" },
+        { label: "武陵綠色隧道自行車道（舊台 9 線永嶺路，4.7 公里）", origin: "武陵綠色隧道北端 永嶺路 鹿野", waypoints: ["武陵綠色隧道自行車道 永嶺路", "武陵綠色隧道南端 永嶺路 鹿野"], destination: "武陵綠色隧道北端 永嶺路 鹿野", stops: "永嶺路北端 → 武陵綠色隧道 → 永嶺路南端", note: "地圖地標可能無法精確落在車道端點，請以現場指標騎乘；2626 市集僅每月雙週星期六 14:00–18:00 舉辦，非每日活動。" },
+        { label: "武陵 → 鹿野龍田（轉場至龍田自行車道）", origin: "武陵綠色隧道 永嶺路 鹿野", waypoints: ["鹿野車站 台東縣鹿野鄉"], destination: "鹿野神社 台東縣鹿野鄉", stops: "武陵綠色隧道 → 鹿野市區／鹿野車站 → 龍田村鹿野神社", note: "此連結是轉場，不把鹿野龍田自行車道 7.2 公里當成武陵至龍田距離。" },
+        { label: "鹿野龍田自行車道（7.2 公里環遊地標）", origin: "鹿野神社 台東縣鹿野鄉", waypoints: ["龍田桐花大道 台東縣鹿野鄉", "鹿野龍田自行車道 台東縣鹿野鄉", "龍田村 台東縣鹿野鄉"], destination: "鹿野神社 台東縣鹿野鄉", stops: "鹿野神社 → 龍田桐花大道 → 龍田自行車道 → 返回鹿野神社", note: "官方 7.2 公里為鹿野龍田自行車道本身；地標串接只作導航參考，沿途請依車道標誌完成環線。" },
+        { label: "鹿野龍田 → 台東市還車（沿 197 縣道）", origin: "鹿野神社 台東縣鹿野鄉", waypoints: ["寶華 台東縣鹿野鄉瑞和村", "石川 台東縣台東市"], destination: "阿勝租車 台東市", stops: "龍田 → 寶華 → 石川 → 阿勝租車", note: "Google 已能辨識寶華與石川地名，但不保證完整沿 197 縣道；開啟後請核對道路名稱，並依原定 197 縣道路線及現場路況騎乘。" }
+      ]
+    };
+
+    const routeEntryTitles = {
+      "1": ["花蓮－瑞穗", "花蓮－瑞穗"],
+      "2": ["瑞穗－玉里", "玉里－富里", "玉里－富里", "富里－池上", "富里－池上", "池上－關山"],
+      "3": ["關山環鎮自行車道", "武陵綠色隧道", "武陵綠色隧道", "鹿野龍田自行車道", "鹿野龍田自行車道", "龍田－台東市"]
+    };
+
+    function renderDayTabs() {
+      dayTabs.replaceChildren();
+      const options = [
+        { value: "1", label: "第 1 天" },
+        { value: "2", label: "第 2 天" },
+        { value: "3", label: "第 3 天" },
+        { value: "other", label: "其他資訊" }
+      ];
+      options.forEach(({ value, label }) => {
+        const button = document.createElement("button");
+        button.className = "sheet-tab";
+        button.type = "button";
+        button.role = "tab";
+        button.setAttribute("aria-selected", String(value === activeDay));
+        button.textContent = label;
+        button.addEventListener("click", () => {
+          activeDay = value;
+          renderDayTabs();
+          renderEntries();
+        });
+        dayTabs.append(button);
+      });
+      dayTabs.hidden = false;
+    }
+
+    function renderEntries() {
+      const query = search.value.trim().toLocaleLowerCase();
+      const dayRows = itinerary.filter(item => item.day === activeDay);
+      const filtered = dayRows.filter(item => [item.title, item.place, item.url, ...(item.fields || []).map(field => `${field.label} ${field.value}`)].join(" ").toLocaleLowerCase().includes(query));
+      entries.replaceChildren();
+      emptyState.hidden = filtered.length > 0;
+      resultCount.textContent = query ? `找到 ${filtered.length} 筆行程` : `共 ${dayRows.length} 筆行程`;
+      emptyTitle.textContent = "沒有符合的行程";
+      emptyCopy.textContent = "換個地點、時間或關鍵字搜尋。";
+
+      filtered.forEach((item, index) => {
+        const card = document.createElement("article");
+        card.className = "entry";
+
+        const heading = document.createElement("div");
+        heading.className = "entry-heading";
+        const number = document.createElement("span");
+        number.className = "entry-index";
+        number.textContent = activeDay === "other" ? "旅程資訊" : `行程 ${String(index + 1).padStart(2, "0")}`;
+        const titleNode = document.createElement("h3");
+        titleNode.className = "entry-title";
+        titleNode.textContent = item.title;
+        heading.append(number, titleNode);
+
+        const fields = document.createElement("div");
+        fields.className = "entry-fields";
+        (item.fields || []).forEach(fieldItem => {
+          const field = document.createElement("div");
+          field.className = "field";
+          const label = document.createElement("span");
+          label.className = "field-label";
+          label.textContent = fieldItem.label;
+          const value = document.createElement("span");
+          value.className = "field-value";
+          value.textContent = fieldItem.value;
+          field.append(label, value);
+          fields.append(field);
+        });
+
+        if (item.url) {
+          const field = document.createElement("div");
+          field.className = "field";
+          const label = document.createElement("span");
+          label.className = "field-label";
+          label.textContent = "參考網址";
+          const value = document.createElement("span");
+          value.className = "field-value";
+          const link = document.createElement("a");
+          link.href = item.url;
+          link.target = "_blank";
+          link.rel = "noopener noreferrer";
+          link.textContent = item.url;
+          value.append(link);
+          field.append(label, value);
+          fields.append(field);
+        }
+        card.append(heading, fields);
+
+        const routesForItem = (dailyRoutes[activeDay] || []).filter((_, routeIndex) => routeEntryTitles[activeDay]?.[routeIndex] === item.title);
+        if (item.place || item.mapOptions?.length || routesForItem.length) {
+          const mapOptions = document.createElement("div");
+          mapOptions.className = "map-options";
+          const mapLabel = document.createElement("span");
+          mapLabel.className = "map-options-label";
+          mapLabel.textContent = routesForItem.length ? "Google 地圖" : "地圖";
+          mapOptions.append(mapLabel);
+
+          const addMapLink = (labelText, query, ariaLabel, option = {}) => {
+            const link = document.createElement("a");
+            link.className = "map-link";
+            if (option.url) {
+              link.href = option.url;
+            } else if (option.origin && option.destination) {
+              const directions = new URLSearchParams({ api: "1", origin: option.origin, destination: option.destination, travelmode: option.travelmode || (option.waypoints ? "bicycling" : "driving") });
+              if (option.waypoints?.length) directions.set("waypoints", option.waypoints.join("|"));
+              link.href = `https://www.google.com/maps/dir/?${directions}`;
+            } else {
+              link.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+            }
+            link.target = "_blank";
+            link.rel = "noopener noreferrer";
+            link.setAttribute("aria-label", ariaLabel);
+            link.innerHTML = option.url || (option.origin && option.destination)
+              ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 6h12M3 12h8m-8 6h12M17 3l4 4-4 4"/></svg>'
+              : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg>';
+            const text = document.createElement("span");
+            text.textContent = labelText;
+            link.append(text);
+            mapOptions.append(link);
+          };
+
+          routesForItem.forEach(route => {
+            addMapLink(`導航：${route.label}`, "", `以 Google 地圖開啟${route.label}`, route);
+            if (route.note) {
+              const routeNote = document.createElement("p");
+              routeNote.className = "route-note";
+              routeNote.textContent = route.note;
+              mapOptions.append(routeNote);
+            }
+          });
+          if (item.place) addMapLink(item.title, item.place, `在地圖中開啟${item.title}`);
+          (item.mapOptions || []).forEach(option => addMapLink(option.label, option.query, `在地圖中搜尋${option.label}`, option));
+          card.append(mapOptions);
+        }
+        entries.append(card);
+      });
+    }
+
+    renderDayTabs();
+    renderEntries();
+    search.addEventListener("input", renderEntries);
+  </script>
+</body>
+</html>
